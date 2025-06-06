@@ -15,6 +15,11 @@ const tabs = [
 const handleTabClick = (tabId: string) => {
   emit('tabChange', tabId);
 };
+
+const openConverter = () => {
+  // Open converter in new tab
+  chrome.tabs.create({ url: chrome.runtime.getURL('converter.html') });
+};
 </script>
 
 <template>
@@ -33,6 +38,13 @@ const handleTabClick = (tabId: string) => {
         @click="handleTabClick(tab.id)"
       >
         {{ tab.label }}
+      </button>
+      <button 
+        class="converter-button"
+        @click="openConverter"
+        title="Open Image Converter in new tab"
+      >
+        🔄 Converter
       </button>
     </nav>
   </header>
@@ -104,5 +116,28 @@ const handleTabClick = (tabId: string) => {
   width: 100%;
   height: 2px;
   background-color: var(--color-primary);
+}
+
+.converter-button {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  border: none;
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  outline: none;
+  margin-left: var(--spacing-2);
+}
+
+.converter-button:focus {
+  outline: none;
+}
+
+.converter-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
 }
 </style>

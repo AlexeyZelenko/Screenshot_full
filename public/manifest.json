@@ -29,7 +29,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["public/editor.html", "editor.js", "assets/*"],
+      "resources": ["public/editor.html", "editor.js", "converter.html", "converter.js", "assets/*"],
       "matches": ["<all_urls>"]
     }
   ],

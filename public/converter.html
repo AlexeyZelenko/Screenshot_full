@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Converter - Vue Screenshot Extension</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-color: #3B82F6;
+            --primary-hover: #2563EB;
+            --success-color: #10B981;
+            --success-hover: #059669;
+            --info-color: #06B6D4;
+            --info-hover: #0891B2;
+            --border-color: #E5E7EB;
+            --border-radius: 8px;
+            --bg-secondary: #F3F4F6;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --border-color: #374151;
+                --bg-secondary: #374151;
+                --text-primary: #F9FAFB;
+                --text-secondary: #D1D5DB;
+                --primary-color: #60A5FA;
+                --success-color: #34D399;
+                --info-color: #22D3EE;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-primary);
+            background-color: #F9FAFB;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1F2937;
+            }
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--spacing-4) var(--spacing-6);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .header {
+                background: #374151;
+            }
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-4);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+
+        .logo img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-8) var(--spacing-6);
+        }
+
+        .image-converter {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-8);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .image-converter {
+                background: #374151;
+            }
+        }
+
+        .converter-header {
+            text-align: center;
+            margin-bottom: var(--spacing-8);
+        }
+
+        .converter-header h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .converter-header p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        .upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-8);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: var(--spacing-8);
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: var(--bg-secondary);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: var(--bg-secondary);
+            transform: scale(1.02);
+        }
+
+        .upload-placeholder .upload-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-4);
+        }
+
+        .upload-placeholder h3 {
+            font-size: 1.25rem;
+            margin-bottom: var(--spacing-2);
+            color: var(--text-primary);
+        }
+
+        .upload-placeholder p {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .image-preview {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-6);
+            justify-content: center;
+        }
+
+        .image-preview img {
+            max-width: 300px;
+            max-height: 200px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-info {
+            text-align: left;
+        }
+
+        .image-info h3 {
+            margin-bottom: var(--spacing-3);
+            color: var(--text-primary);
+        }
+
+        .image-info p {
+            margin-bottom: var(--spacing-1);
+            color: var(--text-secondary);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-6);
+            margin-bottom: var(--spacing-8);
+        }
+
+        .control-section {
+            background: var(--bg-secondary);
+            padding: var(--spacing-6);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .control-section h3 {
+            margin-bottom: var(--spacing-4);
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+
+        .format-options {
+            display: grid;
+            gap: var(--spacing-3);
+        }
+
+        .format-option {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            padding: var(--spacing-3);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .format-option {
+                background: #4B5563;
+            }
+        }
+
+        .format-option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .format-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .format-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .format-label {
+            flex: 1;
+        }
+
+        .format-name {
+            font-weight: 600;
+            display: block;
+            margin-bottom: var(--spacing-1);
+        }
+
+        .format-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .resize-controls {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-4);
+        }
+
+        .resize-option {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            cursor: pointer;
+            padding: var(--spacing-2);
+            border-radius: var(--border-radius);
+            transition: background-color 0.3s ease;
+        }
+
+        .resize-option:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .resize-inputs {
+            display: flex;
+            gap: var(--spacing-4);
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: var(--spacing-3);
+        }
+
+        .resize-inputs label {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-1);
+        }
+
+        .resize-inputs input, .resize-inputs select {
+            padding: var(--spacing-2);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: white;
+            color: var(--text-primary);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .resize-inputs input, .resize-inputs select {
+                background: #4B5563;
+                border-color: #6B7280;
+            }
+        }
+
+        .quality-control {
+            margin-top: var(--spacing-3);
+        }
+
+        .quality-control label {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-2);
+        }
+
+        .quality-control input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+        }
+
+        .preview-section {
+            margin: var(--spacing-8) 0;
+            background: var(--bg-secondary);
+            padding: var(--spacing-6);
+            border-radius: var(--border-radius);
+        }
+
+        .preview-section h3 {
+            margin-bottom: var(--spacing-4);
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            text-align: center;
+        }
+
+        .preview-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-6);
+        }
+
+        .preview-item {
+            text-align: center;
+            padding: var(--spacing-4);
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .preview-item {
+                background: #4B5563;
+            }
+        }
+
+        .preview-item h4 {
+            margin-bottom: var(--spacing-3);
+            color: var(--text-primary);
+        }
+
+        .preview-canvas {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            max-width: 100%;
+            max-height: 300px;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .compression-info {
+            font-weight: 600;
+            margin-top: var(--spacing-1);
+        }
+
+        .compression-info.positive {
+            color: var(--success-color);
+        }
+
+        .compression-info.negative {
+            color: #EF4444;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-4);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons button {
+            padding: var(--spacing-3) var(--spacing-6);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+
+        .convert-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .convert-btn:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .convert-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .download-btn {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .download-btn:hover {
+            background-color: var(--success-hover);
+            transform: translateY(-1px);
+        }
+
+        .save-btn {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .save-btn:hover {
+            background-color: var(--info-hover);
+            transform: translateY(-1px);
+        }
+
+        .clear-btn {
+            background-color: #6B7280;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background-color: #4B5563;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: var(--spacing-4);
+            }
+
+            .image-converter {
+                padding: var(--spacing-4);
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .image-preview {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .resize-inputs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .header-content {
+                padding: 0 var(--spacing-4);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: var(--spacing-3) var(--spacing-4);
+            border-radius: var(--border-radius);
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: var(--success-color);
+        }
+
+        .notification.error {
+            background-color: #EF4444;
+        }
+
+        .notification.info {
+            background-color: var(--info-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="icons/icon48.png" alt="Vue Screenshot">
+                <h1>Image Converter</h1>
+            </div>
+            <div style="margin-left: auto;">
+                <button onclick="window.close()" class="clear-btn">✕ Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="image-converter">
+            <div class="converter-header">
+                <h2>🔄 Image Converter</h2>
+                <p>Convert images to different formats and resize them with professional quality</p>
+            </div>
+
+            <!-- Image Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" accept="image/*" style="display: none">
+                <div class="upload-placeholder" id="uploadPlaceholder">
+                    <div class="upload-icon">📁</div>
+                    <h3>Upload Your Image</h3>
+                    <p>Click here or drag & drop your image file</p>
+                    <p><small>Supports: JPEG, PNG, WebP, GIF, BMP, SVG</small></p>
+                </div>
+                <div class="image-preview hidden" id="imagePreview">
+                    <img id="previewImg" alt="Original image" />
+                    <div class="image-info">
+                        <h3>📊 Image Details</h3>
+                        <p id="imageDimensions"></p>
+                        <p id="imageSize"></p>
+                        <p id="imageFormat"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conversion Controls -->
+            <div id="conversionControls" class="hidden">
+                <div class="controls-grid">
+                    <div class="control-section">
+                        <h3>🎨 Output Format</h3>
+                        <div class="format-options" id="formatOptions">
+                            <label class="format-option" data-format="jpeg">
+                                <input type="radio" name="format" value="jpeg" checked />
+                                <div class="format-label">
+                                    <span class="format-name">JPEG</span>
+                                    <span class="format-desc">Best for photos, smaller files</span>
+                                </div>
+                            </label>
+                            <label class="format-option" data-format="png">
+                                <input type="radio" name="format" value="png" />
+                                <div class="format-label">
+                                    <span class="format-name">PNG</span>
+                                    <span class="format-desc">Lossless, supports transparency</span>
+                                </div>
+                            </label>
+                            <label class="format-option" data-format="webp">
+                                <input type="radio" name="format" value="webp" />
+                                <div class="format-label">
+                                    <span class="format-name">WebP</span>
+                                    <span class="format-desc">Modern format, great compression</span>
+                                </div>
+                            </label>
+                            <label class="format-option" data-format="avif">
+                                <input type="radio" name="format" value="avif" />
+                                <div class="format-label">
+                                    <span class="format-name">AVIF</span>
+                                    <span class="format-desc">Next-gen format, smallest files</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h3>📏 Resize Options</h3>
+                        <div class="resize-controls">
+                            <label class="resize-option">
+                                <input type="radio" name="resize" value="none" checked />
+                                <span>Keep Original Size</span>
+                            </label>
+                            <label class="resize-option">
+                                <input type="radio" name="resize" value="percentage" />
+                                <span>Resize by Percentage</span>
+                            </label>
+                            <label class="resize-option">
+                                <input type="radio" name="resize" value="pixels" />
+                                <span>Resize to Specific Dimensions</span>
+                            </label>
+                        </div>
+
+                        <div class="resize-inputs hidden" id="percentageInputs">
+                            <label>
+                                Scale:
+                                <select id="resizePercentage">
+                                    <option value="25">25%</option>
+                                    <option value="50">50%</option>
+                                    <option value="75">75%</option>
+                                    <option value="100" selected>100%</option>
+                                    <option value="125">125%</option>
+                                    <option value="150">150%</option>
+                                    <option value="200">200%</option>
+                                </select>
+                            </label>
+                        </div>
+
+                        <div class="resize-inputs hidden" id="pixelInputs">
+                            <label>
+                                Width:
+                                <input type="number" id="targetWidth" min="1" max="10000" />
+                            </label>
+                            <label>
+                                Height:
+                                <input type="number" id="targetHeight" min="1" max="10000" />
+                            </label>
+                            <label style="flex-direction: row; align-items: center;">
+                                <input type="checkbox" id="maintainRatio" checked />
+                                <span style="margin-left: 0.5rem;">Maintain aspect ratio</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-section hidden" id="qualitySection">
+                    <h3>⚙️ Quality Settings</h3>
+                    <div class="quality-control">
+                        <label>
+                            Quality: <span id="qualityValue">85</span>%
+                            <input type="range" id="qualitySlider" min="10" max="100" value="85" step="5" />
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="preview-section hidden" id="previewSection">
+                    <h3>👀 Before & After Comparison</h3>
+                    <div class="preview-comparison">
+                        <div class="preview-item">
+                            <h4>Original</h4>
+                            <canvas id="originalCanvas" class="preview-canvas"></canvas>
+                            <p id="originalSize"></p>
+                        </div>
+                        <div class="preview-item">
+                            <h4>Converted</h4>
+                            <canvas id="convertedCanvas" class="preview-canvas"></canvas>
+                            <p id="convertedSize"></p>
+                            <p id="compressionInfo" class="compression-info"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button id="convertBtn" class="convert-btn">
+                        <span>✨ Convert Image</span>
+                    </button>
+                    <button id="downloadBtn" class="download-btn hidden">
+                        <span>📥 Download</span>
+                    </button>
+                    <button id="saveBtn" class="save-btn hidden">
+                        <span>💾 Save to History</span>
+                    </button>
+                    <button id="clearBtn" class="clear-btn">
+                        <span>🗑️ Clear</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="converter.js"></script>
+</body>
+</html> 

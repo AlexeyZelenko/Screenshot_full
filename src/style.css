@@ -11,6 +11,24 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Additional CSS variables for ImageConverter */
+  --primary-color: #3B82F6;
+  --primary-hover: #2563EB;
+  --success-color: #10B981;
+  --success-hover: #059669;
+  --info-color: #06B6D4;
+  --info-hover: #0891B2;
+  --border-color: #E5E7EB;
+  --border-radius: 8px;
+  --bg-secondary: #F3F4F6;
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
 }
 
 a {
@@ -92,5 +110,14 @@ select:focus {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --border-color: #374151;
+    --bg-secondary: #374151;
+    --text-primary: #F9FAFB;
+    --text-secondary: #D1D5DB;
   }
 }
