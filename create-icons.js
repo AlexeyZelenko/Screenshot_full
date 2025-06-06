@@ -1,0 +1,24 @@
+// Base64 SVG иконка камеры
+const svgIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="cameraGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="16" width="32" height="24" rx="4" ry="4" fill="url(#cameraGradient)"/>
+  <circle cx="24" cy="28" r="8" fill="white" stroke="url(#cameraGradient)" stroke-width="2"/>
+  <circle cx="24" cy="28" r="5" fill="url(#cameraGradient)"/>
+  <circle cx="24" cy="28" r="2" fill="white"/>
+  <rect x="14" y="12" width="4" height="4" rx="1" ry="1" fill="url(#cameraGradient)"/>
+  <rect x="32" y="19" width="3" height="2" rx="1" ry="1" fill="white"/>
+  <rect x="18" y="8" width="12" height="8" rx="2" ry="2" fill="url(#cameraGradient)"/>
+</svg>
+`;
+
+// Простая base64 иконка для замены
+const simpleBase64Icon = "data:image/svg+xml;base64," + btoa(svgIcon);
+
+console.log("Base64 иконка готова:");
+console.log(simpleBase64Icon); 
