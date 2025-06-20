@@ -9,16 +9,17 @@ const emit = defineEmits<{
 
 const tabs = [
   { id: 'capture', label: 'Capture' },
-  { id: 'history', label: 'History' }
+  { id: 'history', label: 'History' },
+  { id: 'converter', label: '🔄 Converter', isExternal: true }
 ];
 
 const handleTabClick = (tabId: string) => {
-  emit('tabChange', tabId);
-};
-
-const openConverter = () => {
-  // Open converter in new tab
-  chrome.tabs.create({ url: chrome.runtime.getURL('converter.html') });
+  const clickedTab = tabs.find(tab => tab.id === tabId);
+  if (clickedTab?.isExternal) {
+    chrome.tabs.create({ url: chrome.runtime.getURL('converter.html') });
+  } else {
+    emit('tabChange', tabId);
+  }
 };
 </script>
 
@@ -26,25 +27,18 @@ const openConverter = () => {
   <header class="app-header">
     <div class="logo">
       <img src="/icons/icon48.png" alt="Vue Screenshot" class="logo-img" />
-      <h1 class="logo-text">Vue Screenshot</h1>
+      <h1 class="logo-text">Screenshot</h1>
     </div>
-    
+
     <nav class="tabs">
       <button 
         v-for="tab in tabs" 
         :key="tab.id"
         class="tab-button"
-        :class="{ active: activeTab === tab.id }"
+        :class="{ active: activeTab === tab.id && !tab.isExternal }"
         @click="handleTabClick(tab.id)"
       >
         {{ tab.label }}
-      </button>
-      <button 
-        class="converter-button"
-        @click="openConverter"
-        title="Open Image Converter in new tab"
-      >
-        🔄 Converter
       </button>
     </nav>
   </header>

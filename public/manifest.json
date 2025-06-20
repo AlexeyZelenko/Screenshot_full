@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Vue Screenshot",
-  "version": "1.0.0",
-  "description": "Take beautiful screenshots with this Vue 3 powered extension",
+  "name": "Screenshot, editor/converter images",
+  "version": "1.0.1",
+  "description": "Take beautiful screenshots of the visible area and full page screenshots, edit and convert them to PNG, JPG, WEBP, SVG, ICO, and ICO with transparency",
   "action": {
     "default_popup": "index.html",
     "default_icon": {
